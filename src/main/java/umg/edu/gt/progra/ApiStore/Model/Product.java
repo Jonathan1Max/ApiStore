@@ -67,14 +67,12 @@ public class Product {
         this.description = description;
     }
 
-    
     @Override
     public String toString(){
         return "Product{"
                 + "id =" + productId
                 + ", name = '" + name + "\""
                 + ", price = '" + price  + "\""
-                + ", description = '" + description
-                ;
+                + ", description = '" + description;
     }
 }

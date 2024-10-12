@@ -4,31 +4,57 @@
  */
 package umg.edu.gt.progra.ApiStore.Config;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
-import jakarta.persistence.EntityManagerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder; 
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  *
  * @author J MAX
  */
 @Configuration
+@EnableJpaRepositories(basePackages = "umg.edu.gt.progra.ApiStore.repository")
 public class JpaConfig {
-    @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
-        LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
-        factoryBean.setDataSource(dataSource);
-        factoryBean.setPackagesToScan("umg.edu.gt.progra.ApiStore.Model");
-        factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-        return factoryBean;
-    }
     
+    @Value("${spring.datasource.url}")
+    private String jdbcUrl;
+    
+    @Value("${spring.datasource.username}")
+    private String username;
+    
+    @Value("${spring.datasource.password}")
+    private String password;
+
+    @Bean 
+    @ConfigurationProperties("spring.datasource")
+    public DataSource dataSource() {
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(jdbcUrl);
+        hikariConfig.setUsername(username);
+        hikariConfig.setPassword(password);
+        return new HikariDataSource(hikariConfig);
+    }
+
     @Bean
-    public JpaTransactionManager transactionManager (EntityManagerFactory entityManagerFactory) {
-        return new JpaTransactionManager(entityManagerFactory);
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder, DataSource dataSource) {
+        return builder
+                .dataSource(dataSource)
+                .packages("umg.edu.gt.progra.ApiStore.model")
+                .persistenceUnit("default")
+                .build();
+    }
+
+    @Bean
+    public PlatformTransactionManager transactionManager(LocalContainerEntityManagerFactoryBean entityManagerFactory) {
+        return new JpaTransactionManager(entityManagerFactory.getObject());
     }
 }

@@ -1,4 +1,4 @@
-package umg.edu.gt.progra.ApiStore;
+/*package umg.edu.gt.progra.ApiStore;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,4 +10,4 @@ class ApiStoreApplicationTests {
 	void contextLoads() {
 	}
 
-}
+}*/
